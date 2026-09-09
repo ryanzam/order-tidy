@@ -1,6 +1,10 @@
 {
   "name": "order-tidy",
   "version": "0.1.0",
+  "author": {
+    "name": "ryanzam",
+    "email": "ryanzam2005@yahoo.com"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
