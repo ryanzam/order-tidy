@@ -25,6 +25,7 @@ export async function POST(req: Request) {
         await setSession({
             userId: userCollection._id.toHexString(),
             tenantId: userCollection.tenantId,
+            name: formData.email,
             role: userCollection.role,
         });
 
