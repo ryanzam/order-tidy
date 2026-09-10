@@ -43,6 +43,7 @@ export async function POST(req: Request) {
         await setSession({
             userId: userCollection.insertedId.toHexString(),
             tenantId: tenantId.toHexString(),
+            name: formDate.name,
             role: "owner",
         });
 

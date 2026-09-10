@@ -10,6 +10,7 @@ const secret = new TextEncoder().encode(
 export type Session = {
     userId: string;
     tenantId: string;
+    name: string;
     role: "owner" | "manager" | "waiter" | "kitchen";
 };
 
