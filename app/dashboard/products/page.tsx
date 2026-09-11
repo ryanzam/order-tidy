@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, AlertTriangle } from "lucide-react";
 
 export default function Products() {
     const [products, setProducts] = useState<any[]>([]);
     const [editing, setEditing] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const [form, setForm] = useState({
         name: "",
         description: "",
@@ -15,8 +16,15 @@ export default function Products() {
     });
 
     const load = async () => {
+        setError(null);
         const r = await fetch("/api/products");
-        if (r.ok) setProducts(await r.json());
+
+        if (!r.ok) {
+            setError("You are not authorized to access this page.");
+            return;
+        }
+        const json = await r.json();
+        if (r.ok) setProducts(json);
     };
 
     useEffect(() => {
@@ -59,6 +67,17 @@ export default function Products() {
         await fetch(`/api/products/${id}`, { method: "DELETE" });
         load();
     };
+
+    if (error) {
+        return (
+            <div className="w-full h-full p-5 md:p-10 flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                    <AlertTriangle size={50} color="#7b5e3b" />
+                    <h1 className="text-accent text-2xl">{error}</h1>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-5 md:p-10">
