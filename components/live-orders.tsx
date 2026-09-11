@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Bell, Volume2 } from "lucide-react";
 
 export function LiveOrders({ initial }: { initial: any[] }) {
+
     const [orders, setOrders] = useState(initial);
     const audio = useRef<AudioContext | null>(null);
 
     useEffect(() => {
         const es = new EventSource("/api/orders/events");
-
         es.onmessage = (e) => {
             const x = JSON.parse(e.data);
             if (x.type === "order.created") {
@@ -40,86 +40,7 @@ export function LiveOrders({ initial }: { initial: any[] }) {
             body: JSON.stringify({ status }),
         });
     }
-
-    const activeOrders = orders.filter((o) => o.status !== "completed");
-    const completedOrders = orders.filter((o) => o.status === "completed");
-
-    const renderActiveOrders = () => {
-        if (activeOrders.length === 0) {
-            return (
-                <article className="card p-5">
-                    <div className="flex justify-between gap-4">
-                        <div>
-                            <span className="font-semibold">
-                                No active orders right now.
-                            </span>
-                        </div>
-                    </div>
-                </article>
-            );
-        }
-
-        return activeOrders.map((o) => (
-            <article className="card p-5" key={o._id}>
-                <div className="flex justify-between gap-4">
-                    <div>
-                        <span className="font-semibold">
-                            Table {o.tableNumber}
-                        </span>
-                        <span className="ml-3 text-stone-500">
-                            {o.customerName}
-                        </span>
-                    </div>
-                    <strong>{o.total.toFixed(2)}</strong>
-                </div>
-                <div className="mt-4 space-y-1 text-sm">
-                    {o.items.map((i: any) => (
-                        <div key={i.productId}>
-                            {i.quantity} × {i.name}
-                        </div>
-                    ))}
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-stone-100 px-3 py-1 text-sm">
-                        {o.status}
-                    </span>
-                    {o.status === "pending" && (
-                        <button
-                            onClick={() => status(o._id, "confirmed")}
-                            className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
-                        >
-                            Confirm
-                        </button>
-                    )}
-                    {o.status === "confirmed" && (
-                        <button
-                            onClick={() => status(o._id, "preparing")}
-                            className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
-                        >
-                            Start
-                        </button>
-                    )}
-                    {o.status === "preparing" && (
-                        <button
-                            onClick={() => status(o._id, "ready")}
-                            className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
-                        >
-                            Ready
-                        </button>
-                    )}
-                    {o.status === "ready" && (
-                        <button
-                            onClick={() => status(o._id, "completed")}
-                            className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
-                        >
-                            Complete
-                        </button>
-                    )}
-                </div>
-            </article>
-        ));
-    };
-
+    
     return (
         <div className="p-5 md:p-10">
             <div className="flex items-center justify-between">
@@ -127,54 +48,70 @@ export function LiveOrders({ initial }: { initial: any[] }) {
                     <p className="text-sm text-stone-500">Live operations</p>
                     <h1 className="serif text-4xl">Orders</h1>
                 </div>
-                <div className="rounded-full bg-stone-100 p-3 flex relative">
+                <div className="rounded-full bg-stone-100 p-3">
                     <Bell />
-                    <span className="text-red-500 font-bold absolute top-0 right-0">
-                        {activeOrders}
-                    </span>
                 </div>
             </div>
             <div className="mt-8 grid gap-4">
-                <div className="grid gap-3">
-                    <h3 className="text-xl font-medium text-accent">
-                        Active Orders
-                    </h3>
-                    {renderActiveOrders()}
-                </div>
-            </div>
-            <div className="mt-8 grid gap-4">
-                <div className="grid gap-3">
-                    <h3 className="text-xl font-medium text-accent">
-                        Completed Orders
-                    </h3>
-                    {completedOrders.map((o) => (
-                        <article className="card p-5" key={o._id}>
-                            <div className="flex justify-between gap-4">
-                                <div>
-                                    <span className="font-semibold">
-                                        Table {o.tableNumber}
-                                    </span>
-                                    <span className="ml-3 text-stone-500">
-                                        {o.customerName}
-                                    </span>
-                                </div>
-                                <strong>{o.total.toFixed(2)}</strong>
-                            </div>
-                            <div className="mt-4 space-y-1 text-sm">
-                                {o.items.map((i: any) => (
-                                    <div key={i.productId}>
-                                        {i.quantity} × {i.name}
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                <span className="rounded-full bg-stone-100 px-3 py-1 text-sm">
-                                    {o.status}
+                {orders.map((o) => (
+                    <article className="card p-5" key={o._id}>
+                        <div className="flex justify-between gap-4">
+                            <div>
+                                <span className="font-semibold">
+                                    Table {o.tableNumber}
+                                </span>
+                                <span className="ml-3 text-stone-500">
+                                    {o.customerName}
                                 </span>
                             </div>
-                        </article>
-                    ))}
-                </div>
+                            <strong>{o.total.toFixed(2)}</strong>
+                        </div>
+                        <div className="mt-4 space-y-1 text-sm">
+                            {o.items.map((i: any) => (
+                                <div key={i.productId}>
+                                    {i.quantity} × {i.name}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            <span className="rounded-full bg-stone-100 px-3 py-1 text-sm">
+                                {o.status}
+                            </span>
+                            {o.status === "pending" && (
+                                <button
+                                    onClick={() => status(o._id, "confirmed")}
+                                    className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
+                                >
+                                    Confirm
+                                </button>
+                            )}
+                            {o.status === "confirmed" && (
+                                <button
+                                    onClick={() => status(o._id, "preparing")}
+                                    className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
+                                >
+                                    Start
+                                </button>
+                            )}
+                            {o.status === "preparing" && (
+                                <button
+                                    onClick={() => status(o._id, "ready")}
+                                    className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
+                                >
+                                    Ready
+                                </button>
+                            )}
+                            {o.status === "ready" && (
+                                <button
+                                    onClick={() => status(o._id, "completed")}
+                                    className="rounded-full bg-stone-900 text-white px-3 py-1 text-sm"
+                                >
+                                    Complete
+                                </button>
+                            )}
+                        </div>
+                    </article>
+                ))}
             </div>
             <p className="mt-5 text-xs text-stone-400 flex gap-2">
                 <Volume2 size={14} /> Live order sound is enabled after browser
