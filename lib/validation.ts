@@ -39,7 +39,6 @@ export const orderSchema = z.object({
 export const staffSchema = z.object({
     name: z.string().min(2),
     email: z.email(),
-    phone: z.string(),
     password: z.string().min(8),
     role: z.enum(["manager", "waiter", "kitchen"]),
 });
