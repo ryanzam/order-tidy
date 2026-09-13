@@ -3,8 +3,8 @@ import { db } from "@/lib/db";
 import { LiveOrders } from "@/components/live-orders";
 
 export default async function Dashboard() {
-
     const session = await requireSession();
+
     const rows = await (
         await db()
     )
